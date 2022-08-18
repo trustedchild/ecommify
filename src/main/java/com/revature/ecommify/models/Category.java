@@ -4,6 +4,6 @@ public class Category {
 
     //has many products
 
-    private int id;
+    private String id;
     private String name;
 }
