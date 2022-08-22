@@ -1,4 +1,4 @@
 package com.revature.ecommify.services;
 
-public class ProductServices {
+public class CartService {
 }
