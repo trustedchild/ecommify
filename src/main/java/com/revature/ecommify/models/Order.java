@@ -8,31 +8,30 @@ public class Order {
 
     private String id;
     private String user_id;
-
-    private double total;
-    //private double order_items;
-    private String status = "DEFAULT";
+    private String product_id;
+    private String status;
     private String created_at;
     private String updated_at;
 
     public Order() {
     }
 
-    public Order(String id, String user_id, double total, String created_at) {
+    public Order(String id, String user_id, String product_id, String created_at) {
         this.id = id;
         this.user_id = user_id;
-        this.total = total;
+        this.product_id = product_id;
         this.created_at = created_at;
     }
 
-    public Order(String id, String user_id, double total, String status, String created_at, String updated_at) {
+    public Order(String id, String user_id, String product_id, String status, String created_at, String updated_at) {
         this.id = id;
         this.user_id = user_id;
-        this.total = total;
+        this.product_id = product_id;
         this.status = status;
         this.created_at = created_at;
         this.updated_at = updated_at;
     }
+
 
     public String getId() {
         return id;
@@ -50,12 +49,12 @@ public class Order {
         this.user_id = user_id;
     }
 
-    public double getTotal() {
-        return total;
+    public String getProduct_id() {
+        return product_id;
     }
 
-    public void setTotal(double total) {
-        this.total = total;
+    public void setProduct_id(String product_id) {
+        this.product_id = product_id;
     }
 
     public String getStatus() {
@@ -80,17 +79,5 @@ public class Order {
 
     public void setUpdated_at(String updated_at) {
         this.updated_at = updated_at;
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id='" + id + '\'' +
-                ", user_id='" + user_id + '\'' +
-                ", total=" + total +
-                ", status='" + status + '\'' +
-                ", created_at='" + created_at + '\'' +
-                ", updated_at='" + updated_at + '\'' +
-                '}';
     }
 }

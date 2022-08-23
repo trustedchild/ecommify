@@ -250,7 +250,7 @@ public class LoginMenu implements StartMenu {
     }
 
     private void checkZipcodeAndAndWarnUser(String s){
-        while(!s.matches("(0/91)?[7-9][0-9]{9}")){
+        while(!s.matches("^[0-9]{5}(?:-[0-9]{4})?$")){
             Scanner scan = new Scanner(System.in);
             System.out.print("\nPlease enter a valid zip code: ");
             s = scan.nextLine().trim();

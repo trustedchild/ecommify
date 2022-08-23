@@ -3,6 +3,7 @@ package com.revature.ecommify.services;
 import com.revature.ecommify.daos.OrderDAO;
 import com.revature.ecommify.models.Order;
 
+import java.io.IOException;
 import java.util.List;
 
 public class OrderService {
@@ -19,4 +20,6 @@ public class OrderService {
     public List<Order> getAllOrdersByUserId(String id){
         return orderDAO.getAllByUserId(id);
     }
+
+
 }

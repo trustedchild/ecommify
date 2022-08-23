@@ -1,5 +1,6 @@
 package com.revature.ecommify.ui;
 
+import com.revature.ecommify.models.Order;
 import com.revature.ecommify.models.Product;
 import com.revature.ecommify.models.User;
 import com.revature.ecommify.services.*;
@@ -7,6 +8,8 @@ import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -73,10 +76,10 @@ public class UserDashboard implements StartMenu{
                         viewAllProducts();
                         break;
                     case "2":
-                        viewAllLineItems();
+                        viewPendingOrders();
                         break;
                     case "3":
-                        viewAllOrderedHisttory();
+                        viewCompletedOrders();
                         break;
                     case "x":
                         System.out.println("\nGoodbye!");
@@ -94,16 +97,23 @@ public class UserDashboard implements StartMenu{
 
     }
 
-    private void viewAllOrderedHisttory(){
 
-    }
-
+    //View Products
+    //1. Add to Cart - not yet implemented
+    //2. Purchase/Buy
     private void viewAllProducts(){
         String userInput = "";
         Scanner scan = new Scanner(System.in);
-        //View Products
-        //1. Add to Cart
-        //2. Purchase/Buy
+
+        //create purchase order
+        //Order order;
+        String id = UUID.randomUUID().toString();
+        String user_id = user.getId();
+        String product_id = "";
+        String status = "";
+        DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String created_at = LocalDateTime.now().format(formatDate);;
+        String updated_at  = LocalDateTime.now().format(formatDate);;
 
         exit:
         {
@@ -124,30 +134,79 @@ public class UserDashboard implements StartMenu{
                     }
                 }
 
-                System.out.print("\nSelect a product to buy one (1): ");
+                System.out.print("\nSelect a product to view details: ");
                 int index = scan.nextInt() - 1;
 
                 try {
                     Product selectedProduct = products.get(index);
 
-                    //print qty before deduction
-                    //System.out.println("\n Before " + selectedProduct.getName() + selectedProduct.getQuantity());
+                    //convert image string to emoji unicode
+                    String productImage = String.valueOf(emojiManager.getForAlias(products.get(index).getImage()).getUnicode());
 
-                    //update qty in list and then pass to db
-                    int newUpdatedQty = selectedProduct.getQuantity() -1;
-                    selectedProduct.setQuantity(newUpdatedQty);
-                    productService.updateProductQtyById(selectedProduct);
+                    System.out.println("\n"+ productImage);
+                    System.out.println("ID: " + selectedProduct.getId());
+                    System.out.println("Name: " + selectedProduct.getName());
+                    System.out.println("Description: " + selectedProduct.getDescription());
+                    System.out.println("Brand: " + selectedProduct.getBrand());
+                    System.out.println("Unit Price: " + selectedProduct.getPrice());
+                    System.out.println("Qty in Stock: " + selectedProduct.getQuantity());
+                    System.out.println("Category ID: " + selectedProduct.getCategory_id());
+                    System.out.println("Warehouse ID: " + selectedProduct.getWarehouse_id());
 
-                    //print qty after deduction
-                    System.out.println("\n Purchase successful!");
-                    if (selectedProduct.getQuantity() != 0) {
-                        System.out.println("\n You can still buy more of " + selectedProduct.getName()  );
-                        System.out.println("\nQty in Stock: " + selectedProduct.getQuantity());
-                    }else{
-                        System.out.println("\n Sold out.");
-                        System.out.println("\n Qty in Stock: "  + selectedProduct.getQuantity());
-                    }
-                    //buyNow(selectedProductId);
+                        System.out.println("\n[1] Buy Now");
+                        System.out.println("[2] Add to Cart ");
+                        System.out.println("\nSelect an option: ");
+
+                        int inputOption = scan.nextInt();
+                        switch (inputOption) {
+                            case 1:
+                                System.out.println("Enter a quantity to buy: \n");
+
+                                //update qty in list and then pass to db
+                                int purchaseQty = scan.nextInt();
+                                int stockQty = selectedProduct.getQuantity();
+
+                                if (purchaseQty <= 0){
+                                    System.out.println("\n Not allow! Qty must be greater than zero.");
+                                } else if (purchaseQty > stockQty){
+                                    System.out.println("\n Qty is greater than available! Please choose different qty.");
+                                }else {
+                                    //update product qty in db
+                                    int updateQty =  stockQty - purchaseQty;
+                                    selectedProduct.setQuantity(updateQty);
+                                    productService.updateProductQtyById(selectedProduct);
+
+                                    //create new order with status completed
+                                    product_id = selectedProduct.getId();
+                                    createOrder(id, user_id, product_id, created_at, updated_at);
+
+                                    System.out.println("\n Purchase successful!");
+                                }
+                                break;
+                            case 2:
+                                System.out.println("\nEnter a quantity to add to cart: ");
+
+                                //update qty in list and then pass to db
+                                int addToCartQty = scan.nextInt();
+                                int qtyInStock = selectedProduct.getQuantity();
+
+                                if (addToCartQty <= 0){
+                                    System.out.println("\n Not allow! Qty must be greater than zero.");
+                                } else if (addToCartQty > qtyInStock){
+                                    System.out.println("\n Qty is greater than available! Please choose different qty.");
+                                }else {
+
+                                    //create new order with status completed
+                                    addToCart(id, user_id, product_id, created_at, updated_at);
+
+                                    System.out.println("\n Added to cart successful!");
+                                }
+                                break;
+                            default:
+                                System.out.println("\nInvalid input!");
+                                break;
+                        }
+
 
                 } catch (IndexOutOfBoundsException e) {
                     System.out.println("\nInvalid input!");
@@ -160,25 +219,74 @@ public class UserDashboard implements StartMenu{
 
     }
 
-    private void addToLineItem(){
-        //add to line item
-        //view all lineitems by orderid
-        //ask user to update cart qty if inventory is less than qty in cart
+    //view completed orders
+    private void viewOrderHistory(){
+        //List<Order> orders = orderService.getAllOrders();
+        List<Order> orders = orderService.getAllOrdersByUserId(user.getId());
+
+        //System.out.println(user.getAvatar() + " " + user.getUsername() + " " + user.getLast_name());
+        System.out.println("\nYour Order History: ");
+
+        for (int i = 0; i < orders.size(); i++) {
+            if(orders.get(i).getUser_id().equals(user.getId())){
+                System.out.println("[" + (i + 1) + "] "  + "| Date: " + orders.get(i).getCreated_at() + " | Order ID: " + orders.get(i).getId() + " | Product ID: " + orders.get(i).getProduct_id() + " | ");
+                System.out.println("\nstatus: " + orders.get(i).getStatus());
+            }
+        }
     }
 
-    private void buyNow(String s){
-        //decrement inventory by qty bought
-        //decrementSelectedProductQtyById();
+    //view pending orders in cart
+    private void viewPendingOrders(){
+        List<Order> orders = orderService.getAllOrdersByUserId(user.getId());
 
-        //change order status to completed
-        //updateOrderStatusById();
+        //System.out.println(user.getAvatar() + " " + user.getUsername() + " " + user.getLast_name());
+        System.out.println("\nYour Cart Items: ");
+
+        String orderStatus = "pending";
+
+        for (int i = 0; i < orders.size(); i++) {
+            if(orders.get(i).getStatus().toLowerCase().equals(orderStatus)){
+                System.out.println("[" + (i + 1) + "] "  + "| Date: " + orders.get(i).getCreated_at() + " | Order ID: " + orders.get(i).getId() + " | Product ID: " + orders.get(i).getProduct_id() + " | ");
+            }
+        }
+        if(orders.size() == 0){
+           System.out.println("\nYou have 0 item in your cart. Add item now!");
+        } else {
+
+        }
 
     }
 
-    private void updateOrderStatusById(){
+    private void viewCompletedOrders(){
+        List<Order> orders = orderService.getAllOrdersByUserId(user.getId());
+        //System.out.println(user.getAvatar() + " " + user.getUsername() + " " + user.getLast_name());
+        System.out.println("\nYour Order History: ");
 
+        String orderStatus = "completed";
+
+        for (int i = 0; i < orders.size(); i++) {
+            if(orders.get(i).getStatus().toLowerCase().equals(orderStatus)){
+                System.out.println("[" + (i + 1) + "] "  + "| Date: " + orders.get(i).getCreated_at() + " | Order ID: " + orders.get(i).getId() + " | Product ID: " + orders.get(i).getProduct_id() + " | ");
+            }
+        }
     }
 
+    private Order createOrder(String id, String user_id, String product_id, String created_at, String updated_at) throws IOException {
+        Order order;
+        String status = "completed";
+        order = new Order(id, user_id, product_id, status, created_at, updated_at);
+        orderService.orderDAO.save(order);
+        return order;
+    }
 
+    private Order addToCart(String id, String user_id, String product_id, String created_at, String updated_at) throws IOException {
+        Order order;
+        String status = "pending";
+
+        order = new Order(id, user_id, product_id, status, created_at, updated_at);
+        orderService.orderDAO.save(order);
+        
+        return order;
+    }
 
 }

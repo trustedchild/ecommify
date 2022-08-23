@@ -2,9 +2,13 @@ package com.revature.ecommify.ui;
 
 import com.revature.ecommify.models.*;
 import com.revature.ecommify.services.*;
+import com.revature.ecommify.utils.custom_exceptions.InvalidUserException;
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -71,7 +75,7 @@ public class AdminDashboard implements StartMenu {
                 System.out.println("[4] View Products by Category");
                 System.out.println("[5] View Products by Brand");
                 System.out.println("[6] Add New Product");
-                System.out.println("[7] Add New user/customer");
+                System.out.println("[7] Add New user");
                 System.out.println("[8] Add New Warehouse");
                 System.out.println("[9] Add New Category");
                 System.out.println("[x] Signout!");
@@ -96,15 +100,12 @@ public class AdminDashboard implements StartMenu {
                         //viewInventoryByBrand();
                         break;
                     case "6":
-                        //viewOrderHistoryOfCustomer();
-                        break;
-                    case "7":
                         //addNewProduct();
                         break;
-                    case "8":
-                        //addNewUser();
+                    case "7":
+                        addNewUser();
                         break;
-                    case "9":
+                    case "8":
                         //addNewUser();
                         break;
                     case "x":
@@ -201,11 +202,24 @@ public class AdminDashboard implements StartMenu {
                     System.out.println("Category ID: " + selectedProduct.getCategory_id());
                     System.out.println("Warehouse ID: " + selectedProduct.getWarehouse_id());
 
-                    System.out.println("Select a product to update Qty: " + selectedProduct.getWarehouse_id());
 
+                    System.out.println("\nEnter a quantity to update product Qty: ");
 
+                    //update qty in list and then pass to db
+                    int newQty = scan.nextInt();
+                    if (newQty <= 0){
+                        System.out.println("\n Not allow! Qty must be greated than zero.");
+                    } else {
+                        System.out.println("\n Update successful!");
+                        int previousQty = selectedProduct.getQuantity();
+                        int updateQty = previousQty + newQty;
+                        selectedProduct.setQuantity(updateQty);
+                        productService.updateProductQtyById(selectedProduct);
+                    }
                 } catch (IndexOutOfBoundsException e) {
                     System.out.println("\nInvalid input!");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
 
                 break exit;
@@ -319,4 +333,149 @@ public class AdminDashboard implements StartMenu {
         }
     }
 
+    private User addNewUser() {
+        //String id;
+        String first_name;
+        String last_name;
+        String username;
+        String password;
+        String password2 = "";
+        String email;
+        String phone;
+        String street_address;
+        String city;
+        String zip_code;
+        String country;
+        String avatar; //set by default
+        String role;
+
+        DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String last_sign_in  = LocalDateTime.now().format(formatDate);
+        String created_at = LocalDateTime.now().format(formatDate);;
+        String updated_at  = LocalDateTime.now().format(formatDate);;
+
+        //User user;
+        User newUser;
+        Scanner scan = new Scanner(System.in);
+
+        System.out.println("\nCreating customer account...");
+
+        exit:
+        {
+            while (true) {
+
+                usernameExit:
+                {
+                    while (true) {
+                        System.out.print("\nEnter a first name: ");
+                        first_name = scan.nextLine().toLowerCase().trim();
+                        //checkUserInputAndWarn(first_name);
+                        //userService.isValidUserInput(first_name);
+
+                        System.out.print("\nEnter a last name: ");
+                        last_name = scan.nextLine().toLowerCase().trim();
+                        //checkUserInputAndWarn(last_name);
+                        //userService.isValidUserInput(last_name);
+
+                        System.out.print("\nEnter a username: ");
+                        username = scan.nextLine();
+
+                        System.out.print("\nEnter a email: ");
+                        email = scan.nextLine().toLowerCase().trim();
+                        //checkEmailAndWarnUser(email);
+                        //userService.isValidEmailAddress(email);
+
+                        System.out.print("\nEnter a phone: ");
+                        phone = scan.nextLine().trim();
+                        //checkPhoneNumAndWarnUser(phone);
+                        //userService.isValidPhoneNumber(phone);
+
+
+                        System.out.print("\nEnter a street address: ");
+                        street_address = scan.nextLine().trim();
+
+                        System.out.print("\nEnter a city: ");
+                        city = scan.nextLine().trim();
+                        //checkUserInputAndWarn(city);
+                        //userService.isValidUserInput(city);
+
+                        System.out.print("\nEnter a zipcode: ");
+                        zip_code = scan.nextLine().trim();
+                        //checkZipcodeAndAndWarnUser(zip_code);
+                        //userService.isValidZipCode(zip_code);
+
+                        System.out.print("\nEnter a country: ");
+                        country = scan.nextLine().toLowerCase().trim();
+                        //checkUserInputAndWarn(country);
+                        //userService.isValidUserInput(country);
+
+                        System.out.print("\nSelect profile avatar (M/F): ");
+                        avatar = scan.nextLine().toLowerCase().trim();
+                        for (int i = 0; i < 2; i++){
+                            if (avatar.equals("m")){
+                                avatar = "bust_in_silhouette";
+                            }else if (avatar.equals("f")){
+                                avatar = "bust_in_silhouette";
+                            }else {
+                                avatar = "bust_in_silhouette";
+                            }
+                        }
+
+                        System.out.print("\nEnter a role: ");
+                        role = scan.nextLine().trim();
+                        //checkUserInputAndWarn(role);
+
+                        try {
+                            userService.isValidUsername(username);
+                            userService.isDuplicateUsername(username);
+                            break usernameExit;
+                        } catch (InvalidUserException e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                }
+
+                passwordExit:
+                {
+                    while (true) {
+                        try {
+                            System.out.print("\nEnter a password: ");
+                            password = scan.nextLine();
+
+                            userService.isValidPassword(password);
+
+                            System.out.print("\nRe enter password: ");
+                            password2 = scan.nextLine();
+
+                            userService.isSamePassword(password, password2);
+                            break passwordExit;
+                        } catch (InvalidUserException e) {
+                            System.out.println(e.getMessage());
+                        }
+                    }
+                }
+
+                confirmExit: {
+                    while (true) {
+                        System.out.println("\nIs this correct (y/n):");
+                        System.out.println("Username: " + username + "\nPassword: " + password);
+                        System.out.print("\nEnter: ");
+
+                        switch (scan.nextLine().toLowerCase()) {
+                            case "y":
+                                newUser = new User(UUID.randomUUID().toString(), first_name, last_name, username, password, email, phone, street_address, city, zip_code, country, avatar, role, last_sign_in,  created_at, updated_at);
+                                userService.userDAO.save(newUser);
+                                return newUser;
+                            case "n":
+                                System.out.println("\nRestarting...");
+                                break confirmExit;
+                            default:
+                                System.out.println("\nInvalid input!");
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -9,7 +9,8 @@ import java.util.Scanner;
 
 public class UserService {
 
-    private final UserDAO userDAO;
+    //private final UserDAO userDAO;
+    public final UserDAO userDAO;
 
     public UserService(UserDAO userDAO){
         this.userDAO = userDAO;
