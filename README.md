@@ -25,7 +25,7 @@ Ecommify is the ultimate online marketplace, providing users with a one-stop sho
 ### Built With (Technology)
 
 - Java 
-- Postgresql - to manipulate and store my data.
+- Postgresql - to manipulate and store data.
 - Docker - to host database.
 - Apache maven - to manage dependencies.
 - Junits - for unit testing.
