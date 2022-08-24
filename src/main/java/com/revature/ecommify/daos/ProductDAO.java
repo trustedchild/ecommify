@@ -2,6 +2,7 @@ package com.revature.ecommify.daos;
 
 import com.revature.ecommify.models.Product;
 import com.revature.ecommify.models.User;
+import com.revature.ecommify.utils.custom_exceptions.InvalidInputException;
 import com.revature.ecommify.utils.custom_exceptions.InvalidSQLException;
 import com.revature.ecommify.utils.database.ConnectionFactory;
 
@@ -152,4 +153,10 @@ public class ProductDAO implements CrudDAO<Product>{
             throw new InterruptedIOException("Error while updating record in database.");
         }
     }
+
+    public boolean isValidInput(String input) {
+            if (!input.matches("(?i)[a-z]([- ',.a-z]{0,23}[a-z])?")) throw new InvalidInputException("\nInvalid input values");
+            return true;
+    }
+
 }
