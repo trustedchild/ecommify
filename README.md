@@ -37,6 +37,12 @@ Ecommify is the ultimate online marketplace, providing users with a one-stop sho
 ![ecommifyERDiagram](https://user-images.githubusercontent.com/29290107/186351247-d75d4039-711b-4d11-9ba8-7d0b30c9c691.png)
 
 ### Roadmap
+- complete Reviews component
+- complete Line_Items component
+- Integrate React Frontend
+- Test, test, and test
+- resolve any reported bugs
+- optimize and push changes to production
 
 ### Contributor
 Thomas Guwor
