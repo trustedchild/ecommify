@@ -69,15 +69,15 @@ public class AdminDashboard implements StartMenu {
                 String userAvatar = String.valueOf(emojiManager.getForAlias(user.getAvatar()).getUnicode());
 
                 System.out.println("\n" + userAvatar  + user.getUsername()  + ", Admin\n");
-                System.out.println("[1] View All Users");
-                System.out.println("[2] View All Products in Stock");
-                System.out.println("[3] View Products by Warehouse");
-                System.out.println("[4] View Products by Category");
-                System.out.println("[5] View Products by Brand");
-                System.out.println("[6] Add New Product");
-                System.out.println("[7] Add New user");
-                System.out.println("[8] Add New Warehouse");
-                System.out.println("[9] Add New Category");
+                System.out.println("[1] Add New user");
+                System.out.println("[2] View Users and Orders");
+                System.out.println("[3] View and Update Products Inventory");
+                System.out.println("[4] View Products by Warehouse");
+                System.out.println("[5] View Products by Category");
+                //System.out.println("[5] View Products by Brand");
+                //System.out.println("[7] Add New Product");
+                //System.out.println("[8] Add New Warehouse");
+                //System.out.println("[9] Add New Category");
                 System.out.println("[x] Signout!");
 
                 System.out.print("\nEnter: ");
@@ -85,29 +85,30 @@ public class AdminDashboard implements StartMenu {
 
                 switch (userInput) {
                     case "1":
-                        viewAllUsers();
-                        break;
-                    case "2":
-                        viewAllInventories();
-                        break;
-                    case "3":
-                        viewProductsByWarehouse();
-                        break;
-                    case "4":
-                        viewProductsByCategory();
-                        break;
-                    case "5":
-                        //viewInventoryByBrand();
-                        break;
-                    case "6":
-                        //addNewProduct();
-                        break;
-                    case "7":
                         addNewUser();
                         break;
-                    case "8":
-                        //addNewUser();
+                    case "2":
+                        viewAllUsers();
                         break;
+                    case "3":
+                        viewAllInventories();
+                        break;
+                    case "4":
+                        viewProductsByWarehouse();
+                        break;
+                    case "5":
+                        viewProductsByCategory();
+                        //viewInventoryByBrand();
+                        break;
+//                    case "6":
+//                        //addNewProduct();
+//                        break;
+//                    case "7":
+//                        //addNewUser();
+//                        break;
+//                    case "8":
+//                        //addNewUser();
+//                        break;
                     case "x":
                         System.out.println("\nGoodbye!");
                         break exit;
@@ -130,7 +131,7 @@ public class AdminDashboard implements StartMenu {
                 List<User> users = userService.getAllUsers();
 
                 for (int i = 0; i < users.size(); i++) {
-                    System.out.println("[" + (i + 1) + "] " + users.get(i).getUsername());
+                    System.out.println("[" + (i + 1) + "] " + users.get(i).getFirst_name() + " " + users.get(i).getLast_name());
                 }
 
                 System.out.print("\nSelect a user to view details: ");
@@ -153,15 +154,12 @@ public class AdminDashboard implements StartMenu {
                     System.out.println("Zip Code: " + selectedUser.getZip_code());
                     System.out.println("Country: " + selectedUser.getCountry());
 
-                    System.out.println("\nOrder history:");
 
-                    List<Order> orders = orderService.getAllOrdersByUserId(selectedUser.getId());
+                    //display customer pending order history
+                    viewPendingOrders(selectedUser.getId());
 
-                    for (Order o : orders) {
-                        System.out.println("\nDate: " + o.getCreated_at());
-                        System.out.println("User ID: " + userService.getUserById(o.getUser_id()).getUsername());
-                        //System.out.println("Total: " + o.getAllOrdersTotal());
-                    }
+                    //display customer completed order history
+                    viewCompletedOrders(selectedUser.getId());
 
                 } catch (IndexOutOfBoundsException e) {
                     System.out.println("\nInvalid input!");
@@ -177,6 +175,8 @@ public class AdminDashboard implements StartMenu {
 
         exit: {
             while (true) {
+
+                //listprodutsExit:
                 System.out.println("\nList of Products...");
                 List<Product> products = productService.getAllProducts();
 
@@ -334,126 +334,239 @@ public class AdminDashboard implements StartMenu {
     }
 
     private User addNewUser() {
-        //String id;
-        String first_name;
-        String last_name;
-        String username;
-        String password;
-        String password2 = "";
-        String email;
-        String phone;
-        String street_address;
-        String city;
-        String zip_code;
-        String country;
-        String avatar; //set by default
-        String role;
+            //String id;
+            String first_name="";
+            String last_name="";
+            String username="";
+            String password;
+            String password2 = "";
+            String email ="";
+            String phone="";
+            String street_address="";
+            String city="";
+            String zip_code="";
+            String country="";
+            String avatar="";
+            String role="";
 
-        DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-        String last_sign_in  = LocalDateTime.now().format(formatDate);
-        String created_at = LocalDateTime.now().format(formatDate);;
-        String updated_at  = LocalDateTime.now().format(formatDate);;
+            DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            String last_sign_in  = LocalDateTime.now().format(formatDate);
+            String created_at = LocalDateTime.now().format(formatDate);;
+            String updated_at  = LocalDateTime.now().format(formatDate);;
 
-        //User user;
-        User newUser;
-        Scanner scan = new Scanner(System.in);
+            User newUser;
+            Scanner scan = new Scanner(System.in);
 
-        System.out.println("\nCreating customer account...");
+            System.out.println("\nCreating Customer account...");
 
-        exit:
-        {
-            while (true) {
+            exit:
+            {
 
-                usernameExit:
-                {
-                    while (true) {
-                        System.out.print("\nEnter a first name: ");
-                        first_name = scan.nextLine().toLowerCase().trim();
-                        //checkUserInputAndWarn(first_name);
-                        //userService.isValidUserInput(first_name);
-
-                        System.out.print("\nEnter a last name: ");
-                        last_name = scan.nextLine().toLowerCase().trim();
-                        //checkUserInputAndWarn(last_name);
-                        //userService.isValidUserInput(last_name);
-
-                        System.out.print("\nEnter a username: ");
-                        username = scan.nextLine();
-
-                        System.out.print("\nEnter a email: ");
-                        email = scan.nextLine().toLowerCase().trim();
-                        //checkEmailAndWarnUser(email);
-                        //userService.isValidEmailAddress(email);
-
-                        System.out.print("\nEnter a phone: ");
-                        phone = scan.nextLine().trim();
-                        //checkPhoneNumAndWarnUser(phone);
-                        //userService.isValidPhoneNumber(phone);
-
-
-                        System.out.print("\nEnter a street address: ");
-                        street_address = scan.nextLine().trim();
-
-                        System.out.print("\nEnter a city: ");
-                        city = scan.nextLine().trim();
-                        //checkUserInputAndWarn(city);
-                        //userService.isValidUserInput(city);
-
-                        System.out.print("\nEnter a zipcode: ");
-                        zip_code = scan.nextLine().trim();
-                        //checkZipcodeAndAndWarnUser(zip_code);
-                        //userService.isValidZipCode(zip_code);
-
-                        System.out.print("\nEnter a country: ");
-                        country = scan.nextLine().toLowerCase().trim();
-                        //checkUserInputAndWarn(country);
-                        //userService.isValidUserInput(country);
-
-                        System.out.print("\nSelect profile avatar (M/F): ");
-                        avatar = scan.nextLine().toLowerCase().trim();
-                        for (int i = 0; i < 2; i++){
-                            if (avatar.equals("m")){
-                                avatar = "bust_in_silhouette";
-                            }else if (avatar.equals("f")){
-                                avatar = "bust_in_silhouette";
-                            }else {
-                                avatar = "bust_in_silhouette";
+                while (true) {
+                    firstnameExit:
+                    {
+                        while (true) {
+                            System.out.print("\nEnter a first name: ");
+                            first_name = scan.nextLine().toLowerCase().trim();
+                            //checkUserInputAndWarn(first_name);
+                            //userService.isValidUserInput(first_name);
+                            try {
+                                userService.isValidUserInput(first_name);
+                                break firstnameExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
                             }
                         }
+                    }
 
-                        System.out.print("\nEnter a role: ");
-                        role = scan.nextLine().trim();
-                        //checkUserInputAndWarn(role);
+                    lastnameExit:
+                    {
+                        while (true) {
+                            System.out.print("\nEnter a last name: ");
+                            last_name = scan.nextLine().toLowerCase().trim();
+                            //checkUserInputAndWarn(last_name);
+                            //userService.isValidUserInput(last_name);
 
-                        try {
-                            userService.isValidUsername(username);
-                            userService.isDuplicateUsername(username);
-                            break usernameExit;
-                        } catch (InvalidUserException e) {
-                            System.out.println(e.getMessage());
+                            try {
+                                userService.isValidUserInput(last_name);
+                                break lastnameExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
+                            }
                         }
                     }
-                }
 
-                passwordExit:
-                {
-                    while (true) {
-                        try {
-                            System.out.print("\nEnter a password: ");
-                            password = scan.nextLine();
-
-                            userService.isValidPassword(password);
-
-                            System.out.print("\nRe enter password: ");
-                            password2 = scan.nextLine();
-
-                            userService.isSamePassword(password, password2);
-                            break passwordExit;
-                        } catch (InvalidUserException e) {
-                            System.out.println(e.getMessage());
+                    usernameExit:
+                    {
+                        while (true) {
+                            System.out.print("\nEnter a username: ");
+                            username = scan.nextLine();
+                            try {
+                                userService.isValidUsername(username);
+                                userService.isDuplicateUsername(username);
+                                break usernameExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
+                            }
                         }
                     }
-                }
+
+                    emailExit:
+                    {
+                        while (true) {
+                            System.out.print("\nEnter a email: ");
+                            email = scan.nextLine().toLowerCase().trim();
+                            //checkEmailAndWarnUser(email);
+                            //userService.isValidEmailAddress(email);
+                            try {
+                                userService.isValidEmailAddress(email);
+                                break emailExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                    }
+
+                    phonenumExit:
+                    {
+                        while (true) {
+                            System.out.print("\nEnter a phone: ");
+                            phone = scan.nextLine().trim();
+                            //checkPhoneNumAndWarnUser(phone);
+                            //userService.isValidPhoneNumber(phone);
+                            try {
+                                userService.isValidPhoneNumber(phone);
+                                break phonenumExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                    }
+
+                    streetaddressExit:
+                    {
+                        while (true) {
+                            System.out.print("\nEnter a street address: ");
+                            street_address = scan.nextLine().trim();
+
+                            try {
+                                userService.isValidStreetAddress(street_address);
+                                break streetaddressExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                    }
+
+                    cityExit:
+                    {
+                        while (true) {
+                            System.out.print("\nEnter a city: ");
+                            city = scan.nextLine().trim();
+                            //checkUserInputAndWarn(city);
+                            //userService.isValidUserInput(city);
+
+                            try {
+                                userService.isValidUserInput(city);
+                                break cityExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                    }
+
+                    zipExit:
+                    {
+                        while (true) {
+                            System.out.print("\nEnter a zipcode: ");
+                            zip_code = scan.nextLine().trim();
+                            //checkZipcodeAndAndWarnUser(zip_code);
+                            //userService.isValidZipCode(zip_code);
+
+                            try {
+                                userService.isValidZipCode(zip_code);
+                                break zipExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                    }
+
+                    countryExit:
+                    {
+                        while (true) {
+                            System.out.print("\nEnter a country: ");
+                            country = scan.nextLine().toLowerCase().trim();
+                            //checkUserInputAndWarn(country);
+                            //userService.isValidUserInput(country);
+
+                            try {
+                                userService.isValidUserInput(country);
+                                break countryExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                    }
+
+                    avatarExit:
+                    {
+                        while (true){
+                            System.out.print("\nSelect profile avatar (M/F): ");
+                            avatar = scan.nextLine().toLowerCase().trim();
+                            for (int i = 0; i < 2; i++){
+                                if (avatar.equals("m")){
+                                    avatar = "bust_in_silhouette";
+                                }else if (avatar.equals("f")){
+                                    avatar = "bust_in_silhouette";
+                                }else {
+                                    avatar = "bust_in_silhouette";
+                                }
+
+                                try {
+                                    userService.isValidUserInput(country);
+                                    break avatarExit;
+                                } catch (InvalidUserException e) {
+                                    System.out.println(e.getMessage());
+                                }
+                            }
+                        }
+                    }
+
+                    roleExit:
+                    {
+                        while (true) {
+                            System.out.print("\nEnter a role: ");
+                            role = scan.nextLine().trim();
+                            //checkUserInputAndWarn(role);
+                            try {
+                                userService.isValidUserInput(country);
+                                break roleExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                    }
+
+                    passwordExit:
+                    {
+                        while (true) {
+                            try {
+                                System.out.print("\nEnter a password: ");
+                                password = scan.nextLine();
+
+                                userService.isValidPassword(password);
+
+                                System.out.print("\nRe enter password: ");
+                                password2 = scan.nextLine();
+
+                                userService.isSamePassword(password, password2);
+                                break passwordExit;
+                            } catch (InvalidUserException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        }
+                    }
 
                 confirmExit: {
                     while (true) {
@@ -478,4 +591,37 @@ public class AdminDashboard implements StartMenu {
             }
         }
     }
+
+    private void viewPendingOrders(String customerId){
+        List<Order> orders = orderService.getAllOrdersByUserId(customerId);
+
+        //System.out.println(user.getAvatar() + " " + user.getUsername() + " " + user.getLast_name());
+        System.out.println("\nCart Items: ");
+
+        String orderStatus = "pending";
+        int counter =0;
+
+        for (int i = 0; i < orders.size(); i++) {
+            if(orders.get(i).getStatus().toLowerCase().equals(orderStatus)){
+                System.out.println("[" + (counter + 1) + "] "  + "| Date: " + orders.get(i).getCreated_at() + " | Order ID: " + orders.get(i).getId() + " | Product ID: " + orders.get(i).getProduct_id() + " | ");
+                counter++;
+            }
+        }
+    }
+    private void viewCompletedOrders(String customerId){
+        List<Order> orders = orderService.getAllOrdersByUserId(customerId);
+        //System.out.println(user.getAvatar() + " " + user.getUsername() + " " + user.getLast_name());
+        System.out.println("\nOrder History: ");
+
+        String orderStatus = "completed";
+        int counter =0;
+
+        for (int i = 0; i < orders.size(); i++) {
+            if(orders.get(i).getStatus().toLowerCase().equals(orderStatus)){
+                System.out.println("[" + (counter + 1) + "] "  + "| Date: " + orders.get(i).getCreated_at() + " | Order ID: " + orders.get(i).getId() + " | Product ID: " + orders.get(i).getProduct_id() + " | ");
+                counter++;
+            }
+        }
+    }
+
 }

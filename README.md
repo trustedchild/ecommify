@@ -1,2 +1,14 @@
-# Thomas-PO
-The store app is a software that helps customers purchase products from your business.
+# Ecommify
+
+
+## Description
+
+## Usage
+
+## Built With
+
+## ER Diagram
+
+## Roadmap
+
+## Contact

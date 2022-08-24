@@ -219,21 +219,6 @@ public class UserDashboard implements StartMenu{
 
     }
 
-    //view completed orders
-    private void viewOrderHistory(){
-        //List<Order> orders = orderService.getAllOrders();
-        List<Order> orders = orderService.getAllOrdersByUserId(user.getId());
-
-        //System.out.println(user.getAvatar() + " " + user.getUsername() + " " + user.getLast_name());
-        System.out.println("\nYour Order History: ");
-
-        for (int i = 0; i < orders.size(); i++) {
-            if(orders.get(i).getUser_id().equals(user.getId())){
-                System.out.println("[" + (i + 1) + "] "  + "| Date: " + orders.get(i).getCreated_at() + " | Order ID: " + orders.get(i).getId() + " | Product ID: " + orders.get(i).getProduct_id() + " | ");
-                System.out.println("\nstatus: " + orders.get(i).getStatus());
-            }
-        }
-    }
 
     //view pending orders in cart
     private void viewPendingOrders(){
@@ -243,18 +228,14 @@ public class UserDashboard implements StartMenu{
         System.out.println("\nYour Cart Items: ");
 
         String orderStatus = "pending";
+        int counter = 0;
 
         for (int i = 0; i < orders.size(); i++) {
             if(orders.get(i).getStatus().toLowerCase().equals(orderStatus)){
-                System.out.println("[" + (i + 1) + "] "  + "| Date: " + orders.get(i).getCreated_at() + " | Order ID: " + orders.get(i).getId() + " | Product ID: " + orders.get(i).getProduct_id() + " | ");
+                System.out.println("[" + (counter + 1) + "] "  + "| Date: " + orders.get(i).getCreated_at() + " | Order ID: " + orders.get(i).getId() + " | Product ID: " + orders.get(i).getProduct_id() + " | ");
+                counter++;
             }
         }
-        if(orders.size() == 0){
-           System.out.println("\nYou have 0 item in your cart. Add item now!");
-        } else {
-
-        }
-
     }
 
     private void viewCompletedOrders(){
@@ -263,10 +244,12 @@ public class UserDashboard implements StartMenu{
         System.out.println("\nYour Order History: ");
 
         String orderStatus = "completed";
+        int counter = 0;
 
         for (int i = 0; i < orders.size(); i++) {
             if(orders.get(i).getStatus().toLowerCase().equals(orderStatus)){
-                System.out.println("[" + (i + 1) + "] "  + "| Date: " + orders.get(i).getCreated_at() + " | Order ID: " + orders.get(i).getId() + " | Product ID: " + orders.get(i).getProduct_id() + " | ");
+                System.out.println("[" + (counter + 1) + "] "  + "| Date: " + orders.get(i).getCreated_at() + " | Order ID: " + orders.get(i).getId() + " | Product ID: " + orders.get(i).getProduct_id() + " | ");
+                counter++;
             }
         }
     }

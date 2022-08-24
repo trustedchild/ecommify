@@ -34,22 +34,27 @@ public class UserService {
         return userDAO.getAll();
     }
     public boolean isValidUserInput(String input) {
-        if (!input.matches("(?i)[a-z]([- ',.a-z]{0,23}[a-z])?")) throw new InvalidUserException("\nInvalid input values");
+        if (!input.matches("(?i)[a-z]([- ',.a-z]{0,23}[a-z])?")) throw new InvalidUserException("\nInvalid input values; cannot contain numbers and or special characters");
         return true;
     }
 
 
     public boolean isValidPhoneNumber(String input) {
-        if (!input.matches("(0/91)?[7-9][0-9]{9}")) throw new InvalidUserException("\nInvalid input values");
+        if (!input.matches("^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$")) throw new InvalidUserException("\nInvalid input; cannot contain letters and must be atleast 10 characters.");
         return true;
     }
 
     public boolean isValidEmailAddress(String input) {
-        if (!input.matches("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$")) throw new InvalidUserException("\nInvalid input values");
+        if (!input.matches("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$")) throw new InvalidUserException("\nInvalid email input");
+        return true;
+    }
+
+    public boolean isValidStreetAddress(String input) {
+        if (input.isEmpty()) throw new InvalidUserException("\nInvalid input values, cannot be empty");
         return true;
     }
     public boolean isValidZipCode(String input) {
-        if (!input.matches("(0/91)?[7-9][0-9]{9}")) throw new InvalidUserException("\nInvalid input values");
+        if (!input.matches("^[0-9]{5}(?:-[0-9]{4})?$") )throw new InvalidUserException("\nInvalid input values; cannot contain letters and must be atleast characters.");
         return true;
     }
     public boolean isValidUsername(String username) {
