@@ -16,11 +16,11 @@ import static org.mockito.Mockito.when;
 public class ProductServiceTest {
 
     private ProductService sut;
-    private final ProductDAO mockUserDao = mock(ProductDAO.class);
+    private final ProductDAO mockProductDao = mock(ProductDAO.class);
 
     @Before
     public void setup() {
-        sut = new ProductService(mockUserDao);
+        sut = new ProductService(mockProductDao);
     }
 
 
@@ -30,7 +30,7 @@ public class ProductServiceTest {
         ProductService spiedSut = Mockito.spy(sut);
         String incorrectProduct = "#$5^product";
 
-        when(mockUserDao.isValidInput(incorrectProduct)).thenReturn(true);
+        when(mockProductDao.isValidInput(incorrectProduct)).thenReturn(true);
 
         // Act
         sut.isValidInput(incorrectProduct);
