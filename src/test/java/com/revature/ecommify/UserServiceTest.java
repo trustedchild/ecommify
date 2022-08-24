@@ -90,4 +90,16 @@ public class UserServiceTest {
         sut.isValidZipCode(validZipCode);
     }
 
+    @Test(expected = InvalidUserException.class)
+    public void test_login_invalidLoginGivenIncorrectCredentials() {
+        // Arrange
+        UserService spiedSut = Mockito.spy(sut);
+        String incorrectUsername, incorrectPassword;
+
+        when(mockUserDao.getUserByUsernameAndPassword(incorrectUsername="", incorrectPassword="")).thenReturn(null);
+
+        // Act
+        sut.login(incorrectUsername, incorrectPassword);
+    }
+
 }
