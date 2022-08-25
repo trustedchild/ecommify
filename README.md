@@ -28,7 +28,7 @@ Ecommify is the ultimate online marketplace, providing users with a one-stop sho
 - Postgresql - to manipulate and store data.
 - Docker - to host database.
 - Apache maven - to manage dependencies.
-- Junits - for unit testing.
+- Junit - for unit testing.
 - Mockito - for object testing
 - git - for version control
 ### ER Diagram
